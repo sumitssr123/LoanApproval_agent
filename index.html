@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loan Approval Predictor</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; padding: 20px; }
+        .container { max-width: 600px; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); margin: auto; }
+        h2 { text-align: center; color: #333; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; color: #555; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background-color: #28a745; border: none; color: white; font-size: 16px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        button:hover { background-color: #218838; }
+        #result { margin-top: 20px; padding: 15px; text-align: center; font-size: 18px; font-weight: bold; border-radius: 4px; display: none; }
+        .approved { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .rejected { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Loan Approval Predictor</h2>
+    <form id="loanForm">
+        <!-- Numeric Inputs -->
+        <div class="form-group"><label>Applicant ID</label><input type="number" id="Applicant_ID" value="1" required></div>
+        <div class="form-group"><label>Applicant Income</label><input type="number" id="Applicant_Income" value="60000" required></div>
+        <div class="form-group"><label>Coapplicant Income</label><input type="number" id="Coapplicant_Income" value="0" required></div>
+        <div class="form-group"><label>Age</label><input type="number" id="Age" value="30" required></div>
+        <div class="form-group"><label>Dependents</label><input type="number" id="Dependents" value="0" required></div>
+        <div class="form-group"><label>Credit Score</label><input type="number" id="Credit_Score" value="750" required></div>
+        <div class="form-group"><label>Existing Loans</label><input type="number" id="Existing_Loans" value="0" required></div>
+        <div class="form-group"><label>DTI Ratio</label><input type="number" step="0.01" id="DTI_Ratio" value="0.25" required></div>
+        <div class="form-group"><label>Savings</label><input type="number" id="Savings" value="10000" required></div>
+        <div class="form-group"><label>Collateral Value</label><input type="number" id="Collateral_Value" value="50000" required></div>
+        <div class="form-group"><label>Loan Amount</label><input type="number" id="Loan_Amount" value="200000" required></div>
+        <div class="form-group"><label>Loan Term (Months)</label><input type="number" id="Loan_Term" value="120" required></div>
+
+        <!-- Categorical Inputs -->
+        <div class="form-group"><label>Gender</label>
+            <select id="Gender"><option value="Male">Male</option><option value="Female">Female</option></select>
+        </div>
+        <div class="form-group"><label>Marital Status</label>
+            <select id="Marital_Status"><option value="Single">Single</option><option value="Married">Married</option></select>
+        </div>
+        <div class="form-group"><label>Education Level</label>
+            <select id="Education_Level"><option value="Graduate">Graduate</option><option value="Not Graduate">Not Graduate</option></select>
+        </div>
+        <div class="form-group"><label>Employment Status</label>
+            <select id="Employment_Status"><option value="Salaried">Salaried</option><option value="Self-employed">Self-employed</option><option value="Contract">Contract</option><option value="Unemployed">Unemployed</option></select>
+        </div>
+        <div class="form-group"><label>Employer Category</label>
+            <select id="Employer_Category"><option value="Private">Private</option><option value="Government">Government</option><option value="MNC">MNC</option><option value="Business">Business</option><option value="Unemployed">Unemployed</option></select>
+        </div>
+        <div class="form-group"><label>Loan Purpose</label>
+            <select id="Loan_Purpose"><option value="Home">Home</option><option value="Car">Car</option><option value="Education">Education</option><option value="Personal">Personal</option><option value="Business">Business</option></select>
+        </div>
+        <div class="form-group"><label>Property Area</label>
+            <select id="Property_Area"><option value="Urban">Urban</option><option value="Semiurban">Semiurban</option><option value="Rural">Rural</option></select>
+        </div>
+
+        <button type="submit">Predict Loan Status</button>
+    </form>
+
+    <div id="result"></div>
+</div>
+
+<script>
+    document.getElementById('loanForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        // Gather data from form
+        const data = {
+            Applicant_ID: parseFloat(document.getElementById('Applicant_ID').value),
+            Applicant_Income: parseFloat(document.getElementById('Applicant_Income').value),
+            Coapplicant_Income: parseFloat(document.getElementById('Coapplicant_Income').value),
+            Age: parseFloat(document.getElementById('Age').value),
+            Marital_Status: document.getElementById('Marital_Status').value,
+            Dependents: parseFloat(document.getElementById('Dependents').value),
+            Credit_Score: parseFloat(document.getElementById('Credit_Score').value),
+            Existing_Loans: parseFloat(document.getElementById('Existing_Loans').value),
+            DTI_Ratio: parseFloat(document.getElementById('DTI_Ratio').value),
+            Savings: parseFloat(document.getElementById('Savings').value),
+            Collateral_Value: parseFloat(document.getElementById('Collateral_Value').value),
+            Loan_Amount: parseFloat(document.getElementById('Loan_Amount').value),
+            Loan_Term: parseFloat(document.getElementById('Loan_Term').value),
+            Education_Level: document.getElementById('Education_Level').value,
+            Gender: document.getElementById('Gender').value,
+            Employment_Status: document.getElementById('Employment_Status').value,
+            Loan_Purpose: document.getElementById('Loan_Purpose').value,
+            Property_Area: document.getElementById('Property_Area').value,
+            Employer_Category: document.getElementById('Employer_Category').value
+        };
+
+        // Send data to FastAPI backend
+        try {
+            const response = await fetch('http://127.0.0.1:8000/predict', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            const resultData = await response.json();
+            
+            // Display Result
+            const resultDiv = document.getElementById('result');
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = resultData.message;
+            resultDiv.className = resultData.status === 1 ? 'approved' : 'rejected';
+        } catch (error) {
+            console.error('Error:', error);
+            alert("Failed to connect to the backend server.");
+        }
+    });
+</script>
+
+</body>
+</html>
