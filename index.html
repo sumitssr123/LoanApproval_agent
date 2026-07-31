@@ -132,11 +132,24 @@
 
         // Send data to FastAPI backend
         try {
-            const response = await fetch('http://127.0.0.1:8000/predict', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            });
+            const response = await fetch('/predict', {
+            method: 'POST', // Ya GET, jo bhi aapne FastAPI me set kiya hai
+            headers: {
+            'Content-Type': 'application/json'
+           },
+        body: JSON.stringify({
+        // Yahan aapke form ke inputs aayenge. Example:
+        // gender: document.getElementById('gender').value,
+        // income: document.getElementById('income').value
+    })
+});
+
+// Response ko JSON me convert karna aur show karna
+const data = await response.json();
+console.log(data);
+
+// Agar output show karna hai HTML me:
+// document.getElementById('result').innerText = data.prediction;;
             const resultData = await response.json();
             
             // Display Result
