@@ -23,7 +23,7 @@
 <div class="container">
     <h2>Loan Approval Predictor</h2>
     <form id="loanForm">
-        <!-- Numeric Inputs (Empty by default, with safety limits) -->
+        <!-- Numeric Inputs -->
         <div class="form-group"><label>Applicant ID</label><input type="number" id="Applicant_ID" placeholder="Enter ID" required></div>
         <div class="form-group"><label>Applicant Income</label><input type="number" id="Applicant_Income" placeholder="e.g. 60000" min="0" required></div>
         <div class="form-group"><label>Coapplicant Income</label><input type="number" id="Coapplicant_Income" placeholder="e.g. 0" min="0" required></div>
@@ -37,7 +37,7 @@
         <div class="form-group"><label>Loan Amount</label><input type="number" id="Loan_Amount" placeholder="e.g. 200000" min="0" required></div>
         <div class="form-group"><label>Loan Term (Months)</label><input type="number" id="Loan_Term" placeholder="e.g. 120" min="1" max="360" required></div>
 
-        <!-- Categorical Inputs (Blank default options) -->
+        <!-- Categorical Inputs -->
         <div class="form-group"><label>Gender</label>
             <select id="Gender" required>
                 <option value="" disabled selected>Select Gender...</option>
@@ -107,8 +107,8 @@
     document.getElementById('loanForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         
-        // Gather data from form
-        const data = {
+        // Gather data from form into a single object called formData
+        const formData = {
             Applicant_ID: parseFloat(document.getElementById('Applicant_ID').value),
             Applicant_Income: parseFloat(document.getElementById('Applicant_Income').value),
             Coapplicant_Income: parseFloat(document.getElementById('Coapplicant_Income').value),
@@ -130,33 +130,25 @@
             Employer_Category: document.getElementById('Employer_Category').value
         };
 
-        // Send data to FastAPI backend
+        // Send data to FastAPI backend using async/await
         try {
-            const response = await fetch('/predict', {
-            method: 'POST', // Ya GET, jo bhi aapne FastAPI me set kiya hai
-            headers: {
-            'Content-Type': 'application/json'
-           },
-        body: JSON.stringify({
-        // Yahan aapke form ke inputs aayenge. Example:
-        // gender: document.getElementById('gender').value,
-        // income: document.getElementById('income').value
-    })
-});
+            const response = await fetch('https://loan-backendapi.onrender.com/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData) 
+            });
 
-// Response ko JSON me convert karna aur show karna
-const data = await response.json();
-console.log(data);
-
-// Agar output show karna hai HTML me:
-// document.getElementById('result').innerText = data.prediction;;
+            // Convert the response to JSON
             const resultData = await response.json();
             
-            // Display Result
+            // Display Result in the UI
             const resultDiv = document.getElementById('result');
             resultDiv.style.display = 'block';
             resultDiv.textContent = resultData.message;
             resultDiv.className = resultData.status === 1 ? 'approved' : 'rejected';
+            
         } catch (error) {
             console.error('Error:', error);
             alert("Failed to connect to the backend server.");
